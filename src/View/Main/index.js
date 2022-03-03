@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const Loading = () => {
+const Main = () => {
     return (
         <View>
-            <Text>Loading APP</Text>
+            <Text>Main</Text>
         </View>
     )
 }
 
-export default Loading;
+export default Main;

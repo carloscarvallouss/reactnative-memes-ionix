@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const Loading = () => {
+const Search = () => {
     return (
         <View>
-            <Text>Loading APP</Text>
+            <Text>Search Section</Text>
         </View>
     )
 }
 
-export default Loading;
+export default Search;
