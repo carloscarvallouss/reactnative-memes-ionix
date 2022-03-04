@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-const Loading = ({ children }) => {
+const MainContainer = ({ children }) => {
     return (
         <View style={styles.container}>
             {children}
@@ -15,4 +15,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Loading;
+export default MainContainer;
