@@ -11,7 +11,10 @@ const MainContainer = ({ children }) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor: "#fff",
+        padding: 10,
+        paddingTop: 50,
     }
 })
 

@@ -69,7 +69,7 @@ const ConfigurationScreen = ({ navigation }) => {
                                     <Text style={styles.textButton}>Permitir</Text>
                                 </Button>
                                 <Button
-                                    onPress={() => backStep()}
+                                    onPress={() => toMain()}
                                 ><Text style={styles.cancelTextButton}>Cancelar</Text>
                                 </Button>
                             </View>
