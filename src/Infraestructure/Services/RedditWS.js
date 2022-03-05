@@ -1,7 +1,11 @@
 import axios from "axios"
 
-export const getMemes = ({ cancelSource }, res) => {
-    axios.get("https://www.reddit.com/r/chile/new/.json?limit=100", {
+export const getMemes = ({ cancelSource, paginate = false, lastItem = "" }, res) => {
+
+    let paginationString = paginate ? `&after=${lastItem}` : ``
+    let url = `https://www.reddit.com/r/chile/new/.json?limit=100${paginationString}`
+
+    axios.get(url, {
         cancelToken: cancelSource.token
     })
         .then(data => {
@@ -11,12 +15,16 @@ export const getMemes = ({ cancelSource }, res) => {
                 res([])
         })
         .catch(e => {
+            console.log(e)
             res([])
         })
 }
 
-export const searchMemes = ({ text, cancelSource }, res) => {
-    axios.get(`https://www.reddit.com/r/chile/search.json?q=${text}&limit=100`, {
+export const searchMemes = ({ text, cancelSource, paginate, lastItem }, res) => {
+    let paginationString = paginate ? `&after=${lastItem}` : ``
+    let url = `https://www.reddit.com/r/chile/search.json?q=${text}&limit=100${paginationString}`
+    console.log(url)
+    axios.get(url, {
         cancelToken: cancelSource.token
     })
         .then(data => {

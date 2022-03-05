@@ -1,15 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { View, ImageBackground, Image, StyleSheet, ActivityIndicator } from "react-native";
+import { UserContext } from "../../Application/Context/User/UserContext";
 
 const imageLogo = require("../../Assets/Images/reddit-1.png")
 const imageBackground = require("../../Assets/Images/Background.png")
 
 const LoadingScreen = ({ navigation }) => {
+    const { getConfigState, config } = useContext(UserContext)
     useEffect(() => {
-        setTimeout(() => {
-            navigation.replace("Config")
-        }, 2000);
-    }, [])
+        getConfigState()
+        if (config === "viewed") {
+            setTimeout(() => {
+                navigation.replace("Main")
+            }, 2000);
+        }
+        else if (config === "unviewed") {
+            setTimeout(() => {
+                navigation.replace("Config")
+            }, 2000);
+        }
+
+    }, [config])
     return (
         <View style={styles.container}>
             <ImageBackground

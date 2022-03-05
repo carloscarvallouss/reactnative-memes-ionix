@@ -1,50 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Keyboard, View, ScrollView, Image, TextInput, StyleSheet, Text, ActivityIndicator, RefreshControl, StatusBar } from "react-native";
 import Button from "../Common/Button";
 import MainContainer from '../Common/MainContainer'
 import Box from "./Box";
 import SearchScreen from "../Search";
-import { getMemes } from "../../Infraestructure/Services/RedditWS";
 import NotFoundScreen from "../Common/NotFound";
-import axios from "axios";
+import useMemes from "../../Application/Hooks/useMemes";
 
 const ConfigIcon = require("../../Assets/Images/Bitmap.png")
 const SearchIcon = require("../../Assets/Images/SearchIcon.png")
 
 const MainScreen = ({ navigation }) => {
-    const [mainData, setMainData] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false);
+
     const [searchText, setSearchText] = useState("")
-    const cancelSource = axios.CancelToken.source();
+    const [isLoading, mainMemes, refreshing, setRefreshing, pagintation, setPagination] = useMemes()
 
-    useEffect(() => {
-        setTimeout(() => {
-            getMemes({ cancelSource }, res => {
-                let filtered = res.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
-                setMainData(filtered)
-                setIsLoading(false)
-            })
-        }, 2000);
-        return () => {
-            cancelSource("cancel")
-        }
-    }, [])
-
-    const onRefresh = () => {
-        setRefreshing(true)
-        setTimeout(() => {
-            getMemes({ cancelSource }, res => {
-                let filtered = res.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
-                setMainData(filtered)
-                setIsLoading(false)
-                setRefreshing(false)
-            })
-        }, 2000);
-    }
     const goToConfig = () => {
         navigation.navigate("Config")
     }
+    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+        return layoutMeasurement.height + contentOffset.y >=
+            contentSize.height;
+    };
+
     const configSection = () => (
         <View style={styles.config}>
             <Button onPress={() => goToConfig()}>
@@ -79,22 +57,36 @@ const MainScreen = ({ navigation }) => {
                                     <ActivityIndicator />
                                     <Text style={styles.textLoading}>Cargando memes...</Text>
                                 </View>
-                                : mainData.length > 0 ? <ScrollView
+                                : <ScrollView
                                     style={styles.content}
+                                    scrollEventThrottle={1}
                                     showsVerticalScrollIndicator={false}
                                     onTouchStart={() => Keyboard.dismiss()}
+                                    onScroll={({ nativeEvent }) => {
+                                        if (isCloseToBottom(nativeEvent)) {
+                                            if (!pagintation)
+                                                setPagination(true)
+                                        }
+                                    }}
                                     refreshControl={
                                         <RefreshControl
                                             refreshing={refreshing}
-                                            onRefresh={onRefresh}
+                                            onRefresh={() => setRefreshing(true)}
                                         />
                                     }
                                 >
-                                    {mainData.map((meme, index) => (
-                                        <Box key={index} meme={meme} />
-                                    ))
+                                    {mainMemes.length > 0
+                                        ? <>
+                                            {mainMemes.map((meme, index) => (
+                                                <Box key={index} meme={meme} />
+                                            ))}
+                                            {pagintation && <>
+                                                <ActivityIndicator size={"large"} />
+                                            </>}
+                                        </>
+                                        : <NotFoundScreen />
                                     }
-                                </ScrollView> : <NotFoundScreen />
+                                </ScrollView>
                         }
 
                     </>
@@ -129,7 +121,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        marginTop: 20
+        marginVertical: 20
     },
     loadingBox: {
         flex: 1,

@@ -1,32 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, View, Text, ActivityIndicator, ScrollView } from "react-native";
 import NotFoundScreen from "../Common/NotFound";
-import { searchMemes } from "../../Infraestructure/Services/RedditWS";
 import axios from "axios";
 import Box from "../Main/Box";
+
+import { UserContext } from "../../Application/Context/User/UserContext";
 
 const Search = ({ searchText }) => {
 
     const [isLoading, setIsLoading] = useState(false)
+    const [paginate, setPaginate] = useState(false)
     const [findedMemes, setFindedMemes] = useState([])
     const cancelSource = axios.CancelToken.source();
+    const { search, searchMemesState } = useContext(UserContext);
 
     useEffect(() => {
         if (searchText !== "") {
             setIsLoading(true)
-            searchMemes({ text: searchText, cancelSource }, response => {
-                console.log("data", response)
-                if (response.status !== "cancel") {
-                    let filtered = response.data.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
-                    setFindedMemes(filtered)
-                    setIsLoading(false)
-                }
-            })
+            searchMemesState({ text: searchText, cancelSource })
         }
         return () => {
             cancelSource.cancel("cancel")
         }
     }, [searchText])
+
+    useEffect(() => {
+        if (paginate && search.length > 0) {
+            let lastItem = search[search.length - 1].data.name
+            searchMemesState({ text: searchText, cancelSource, paginate, lastItem })
+            setTimeout(() => {
+                setPaginate(false)
+            }, 2000);
+        }
+
+    }, [paginate])
+
+    useEffect(() => {
+        if (search) {
+            setFindedMemes(search)
+            setIsLoading(false)
+        }
+    }, [search])
+
+    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+        return layoutMeasurement.height + contentOffset.y >=
+            contentSize.height;
+    };
 
     if (isLoading)
         return (<View style={styles.loadingBox}>
@@ -41,12 +60,20 @@ const Search = ({ searchText }) => {
         <ScrollView
             style={styles.content}
             showsVerticalScrollIndicator={false}
+            onScroll={({ nativeEvent }) => {
+                if (isCloseToBottom(nativeEvent)) {
+                    if (!paginate)
+                        setPaginate(true)
+                }
+            }}
+            scrollEventThrottle={1}
         >
             {
                 findedMemes.map((meme, index) => (
                     <Box key={index} meme={meme} />
                 ))
             }
+            {paginate && <ActivityIndicator size={"large"} />}
         </ScrollView>
     )
 }

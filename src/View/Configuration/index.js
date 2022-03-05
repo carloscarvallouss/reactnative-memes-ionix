@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
 import Button from "../Common/Button";
 import PermisionButton from "./PermissionButton";
+import { UserContext } from "../../Application/Context/User/UserContext";
 
 const { width } = Dimensions.get("window")
 const STEPPER_LIST = [
@@ -28,6 +29,7 @@ const STEPPER_LIST = [
 const ConfigurationScreen = ({ navigation }) => {
     const [step, setStep] = useState(0);
     const scrollRef = useRef();
+    const { setConfigState, config } = useContext(UserContext)
 
     useEffect(() => {
         if (scrollRef.current !== null)
@@ -44,6 +46,7 @@ const ConfigurationScreen = ({ navigation }) => {
 
     }
     const toMain = () => {
+        if (!config) setConfigState()
         navigation.replace("Main")
     }
     return (
