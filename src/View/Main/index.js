@@ -5,6 +5,7 @@ import MainContainer from '../Common/MainContainer'
 import Box from "./Box";
 import SearchScreen from "../Search";
 import NotFoundScreen from "../Common/NotFound";
+import ErrorConnection from "../Common/ErrorConnection";
 import useMemes from "../../Application/Hooks/useMemes";
 
 const ConfigIcon = require("../../Assets/Images/Bitmap.png")
@@ -13,7 +14,7 @@ const SearchIcon = require("../../Assets/Images/SearchIcon.png")
 const MainScreen = ({ navigation }) => {
 
     const [searchText, setSearchText] = useState("")
-    const [isLoading, mainMemes, refreshing, setRefreshing, pagintation, setPagination] = useMemes()
+    const [isLoading, mainMemes, refreshing, setRefreshing, pagintation, setPagination, isError] = useMemes()
 
     const goToConfig = () => {
         navigation.navigate("Config")
@@ -75,16 +76,18 @@ const MainScreen = ({ navigation }) => {
                                         />
                                     }
                                 >
-                                    {mainMemes.length > 0
-                                        ? <>
-                                            {mainMemes.map((meme, index) => (
-                                                <Box key={index} meme={meme} />
-                                            ))}
-                                            {pagintation && <>
-                                                <ActivityIndicator size={"large"} />
-                                            </>}
-                                        </>
-                                        : <NotFoundScreen />
+                                    {isError
+                                        ? <ErrorConnection />
+                                        : mainMemes.length > 0
+                                            ? <>
+                                                {mainMemes.map((meme, index) => (
+                                                    <Box key={index} meme={meme} />
+                                                ))}
+                                                {pagintation && <>
+                                                    <ActivityIndicator size={"large"} />
+                                                </>}
+                                            </>
+                                            : <NotFoundScreen />
                                     }
                                 </ScrollView>
                         }

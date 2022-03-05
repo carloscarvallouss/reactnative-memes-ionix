@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, ActivityIndicator, ScrollView } from "react-nat
 import NotFoundScreen from "../Common/NotFound";
 import axios from "axios";
 import Box from "../Main/Box";
+import ErrorConnection from "../Common/ErrorConnection";
 
 import { UserContext } from "../../Application/Context/User/UserContext";
 
@@ -12,7 +13,7 @@ const Search = ({ searchText }) => {
     const [paginate, setPaginate] = useState(false)
     const [findedMemes, setFindedMemes] = useState([])
     const cancelSource = axios.CancelToken.source();
-    const { search, searchMemesState } = useContext(UserContext);
+    const { search, searchMemesState, isError } = useContext(UserContext);
 
     useEffect(() => {
         if (searchText !== "") {
@@ -46,6 +47,9 @@ const Search = ({ searchText }) => {
         return layoutMeasurement.height + contentOffset.y >=
             contentSize.height;
     };
+
+    if (isError)
+        return (<ErrorConnection />)
 
     if (isLoading)
         return (<View style={styles.loadingBox}>

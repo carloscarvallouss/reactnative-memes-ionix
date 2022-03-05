@@ -9,6 +9,7 @@ const UserState = (props) => {
         config: null,
         memes: null,
         search: null,
+        isError: false,
     };
 
     const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -31,7 +32,14 @@ const UserState = (props) => {
 
     const getMemesState = ({ cancelSource, paginate = false, lastItem = "" }) => {
         getMemes({ cancelSource, paginate, lastItem }, res => {
-            let filtered = res.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
+            if (res.status === "error") {
+                dispatch({
+                    type: 'ERROR_CONNECTION',
+                    payload: true,
+                })
+                return
+            }
+            let filtered = res.data.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
             dispatch({
                 type: paginate ? 'PUSH_MEMES' : 'GET_MEMES',
                 payload: filtered
@@ -41,6 +49,13 @@ const UserState = (props) => {
 
     const searchMemesState = ({ cancelSource, text, paginate = false, lastItem = "" }) => {
         searchMemes({ text, cancelSource, paginate, lastItem }, response => {
+            if (response.status === "error") {
+                dispatch({
+                    type: 'ERROR_CONNECTION',
+                    payload: true,
+                })
+                return
+            }
             if (response.status !== "cancel") {
                 let filtered = response.data.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
                 dispatch({
@@ -56,6 +71,7 @@ const UserState = (props) => {
             config: state.config,
             memes: state.memes,
             search: state.search,
+            isError: state.isError,
             getMemesState,
             searchMemesState,
             getConfigState,
