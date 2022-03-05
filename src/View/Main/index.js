@@ -3,7 +3,10 @@ import { Keyboard, View, ScrollView, Image, TextInput, StyleSheet, Text, Activit
 import Button from "../Common/Button";
 import MainContainer from '../Common/MainContainer'
 import Box from "./Box";
+import SearchScreen from "../Search";
 import { getMemes } from "../../Infraestructure/Services/RedditWS";
+import NotFoundScreen from "../Common/NotFound";
+import axios from "axios";
 
 const ConfigIcon = require("../../Assets/Images/Bitmap.png")
 const SearchIcon = require("../../Assets/Images/SearchIcon.png")
@@ -13,20 +16,25 @@ const MainScreen = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false);
     const [searchText, setSearchText] = useState("")
+    const cancelSource = axios.CancelToken.source();
+
     useEffect(() => {
         setTimeout(() => {
-            getMemes("page", res => {
+            getMemes({ cancelSource }, res => {
                 let filtered = res.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
                 setMainData(filtered)
                 setIsLoading(false)
             })
         }, 2000);
-
+        return () => {
+            cancelSource("cancel")
+        }
     }, [])
+
     const onRefresh = () => {
         setRefreshing(true)
         setTimeout(() => {
-            getMemes("page", res => {
+            getMemes({ cancelSource }, res => {
                 let filtered = res.filter(i => i.data.link_flair_text === "Shitposting").filter(i => i.data.post_hint === "image")
                 setMainData(filtered)
                 setIsLoading(false)
@@ -46,7 +54,6 @@ const MainScreen = ({ navigation }) => {
     )
     const search = (text) => {
         setSearchText(text)
-        setIsLoading(true)
     }
     const searchBox = () => (<View style={styles.searchBox}>
         <Image style={styles.searchIcon} source={SearchIcon} />
@@ -63,29 +70,39 @@ const MainScreen = ({ navigation }) => {
             {configSection()}
             {searchBox()}
             {
-                isLoading
-                    ?
-                    <View onTouchStart={() => Keyboard.dismiss()} style={styles.loadingBox}>
-                        <ActivityIndicator />
-                        <Text style={styles.textLoading}>Cargando memes...</Text>
-                    </View>
-                    : <ScrollView
-                        style={styles.content}
-                        showsVerticalScrollIndicator={false}
-                        onTouchStart={() => Keyboard.dismiss()}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={refreshing}
-                                onRefresh={onRefresh}
-                            />
+                searchText === "" ? (
+                    <>
+                        {
+                            isLoading
+                                ?
+                                <View onTouchStart={() => Keyboard.dismiss()} style={styles.loadingBox}>
+                                    <ActivityIndicator />
+                                    <Text style={styles.textLoading}>Cargando memes...</Text>
+                                </View>
+                                : mainData.length > 0 ? <ScrollView
+                                    style={styles.content}
+                                    showsVerticalScrollIndicator={false}
+                                    onTouchStart={() => Keyboard.dismiss()}
+                                    refreshControl={
+                                        <RefreshControl
+                                            refreshing={refreshing}
+                                            onRefresh={onRefresh}
+                                        />
+                                    }
+                                >
+                                    {mainData.map((meme, index) => (
+                                        <Box key={index} meme={meme} />
+                                    ))
+                                    }
+                                </ScrollView> : <NotFoundScreen />
                         }
-                    >
-                        {mainData.map((meme, index) => (
-                            <Box key={index} meme={meme} />
-                        ))}
 
-                    </ScrollView>
+                    </>
+                ) : (
+                    <SearchScreen searchText={searchText} />
+                )
             }
+
 
 
         </MainContainer>
