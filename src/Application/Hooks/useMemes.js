@@ -7,7 +7,7 @@ const useMemes = () => {
     const [mainMemes, setMainMemes] = useState([])
     const [refreshing, setRefreshing] = useState(false)
     const [pagintation, setPagination] = useState(false)
-    const { memes, getMemesState } = useContext(UserContext);
+    const { memes, getMemesState, isError } = useContext(UserContext);
     const cancelSource = axios.CancelToken.source();
 
     useEffect(() => {
@@ -43,7 +43,7 @@ const useMemes = () => {
         }
     }, [pagintation])
 
-    return [isLoading, mainMemes, refreshing, setRefreshing, pagintation, setPagination]
+    return [isLoading, mainMemes, refreshing, setRefreshing, pagintation, setPagination, isError]
 }
 
 export default useMemes;
