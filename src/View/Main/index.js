@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, Image, TextInput, StyleSheet, Text, ActivityIndicator, RefreshControl } from "react-native";
+import { Keyboard, View, ScrollView, Image, TextInput, StyleSheet, Text, ActivityIndicator, RefreshControl, StatusBar } from "react-native";
 import Button from "../Common/Button";
 import MainContainer from '../Common/MainContainer'
 import Box from "./Box";
@@ -12,6 +12,7 @@ const MainScreen = ({ navigation }) => {
     const [mainData, setMainData] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false);
+    const [searchText, setSearchText] = useState("")
     useEffect(() => {
         setTimeout(() => {
             getMemes("page", res => {
@@ -43,23 +44,35 @@ const MainScreen = ({ navigation }) => {
             </Button>
         </View>
     )
+    const search = (text) => {
+        setSearchText(text)
+        setIsLoading(true)
+    }
     const searchBox = () => (<View style={styles.searchBox}>
-        <Image source={SearchIcon} />
-        <TextInput style={styles.inputBox} placeholder="Buscar" />
+        <Image style={styles.searchIcon} source={SearchIcon} />
+        <TextInput
+            value={searchText}
+            onChangeText={(text) => search(text)}
+            style={styles.inputBox}
+            placeholder="Buscar"
+        />
     </View>)
     return (
         <MainContainer>
+            <StatusBar translucent backgroundColor={"#fff"} />
             {configSection()}
             {searchBox()}
             {
                 isLoading
                     ?
-                    <View style={styles.loadingBox}>
+                    <View onTouchStart={() => Keyboard.dismiss()} style={styles.loadingBox}>
                         <ActivityIndicator />
                         <Text style={styles.textLoading}>Cargando memes...</Text>
                     </View>
                     : <ScrollView
                         style={styles.content}
+                        showsVerticalScrollIndicator={false}
+                        onTouchStart={() => Keyboard.dismiss()}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
@@ -85,18 +98,21 @@ const styles = StyleSheet.create({
     searchBox: {
         flexDirection: "row",
         backgroundColor: "#D8D8D8",
-        paddingVertical: 15,
-        paddingHorizontal: 20,
         borderRadius: 8,
+        justifyContent: "center",
+    },
+    searchIcon: {
+        marginVertical: 12,
+        marginLeft: 10,
     },
     inputBox: {
-        width: "100%",
+        width: "90%",
         marginHorizontal: 10,
+        height: 40,
     },
     content: {
         flex: 1,
-        marginTop: 20,
-        overflow: "visible"
+        marginTop: 20
     },
     loadingBox: {
         flex: 1,

@@ -1,25 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, Dimensions } from "react-native";
 import Button from "../Common/Button";
+import PermisionButton from "./PermissionButton";
 
 const { width } = Dimensions.get("window")
 const STEPPER_LIST = [
     {
         title: "Acceso a Cámara",
         message: "Por favor, admite el acceso a tu cámara para tomar fotos",
-        image: require("../../Assets/Images/Artwork-Camera.png")
+        image: require("../../Assets/Images/Artwork-Camera.png"),
+        permissionId: "CAMERA",
     },
     {
         title: "Permitir notificaciones push",
         message: "Permite notificaciones push para que podamos enviarte noticias personales y actualizaciones",
-        image: require("../../Assets/Images/Artwork.png")
+        image: require("../../Assets/Images/Artwork.png"),
+        permissionId: "NOTIFICATION",
     },
     {
         title: "Permitir servicios de localización",
         message: "Buscamos acceder a tu ubicación solo para entregar una mejor experiencia",
-        image: require("../../Assets/Images/Artwork-Location.png")
+        image: require("../../Assets/Images/Artwork-Location.png"),
+        permissionId: "LOCATION",
     }
 ]
+
 const ConfigurationScreen = ({ navigation }) => {
     const [step, setStep] = useState(0);
     const scrollRef = useRef();
@@ -31,13 +36,12 @@ const ConfigurationScreen = ({ navigation }) => {
 
     const nextStep = (action) => {
         if (step > STEPPER_LIST.length - 2) {
-            //Salir de la vista y navegar al Home
-            console.log("salir de la vista")
             toMain()
             return
         }
         setStep(step + 1)
         return
+
     }
     const toMain = () => {
         navigation.replace("Main")
@@ -62,12 +66,10 @@ const ConfigurationScreen = ({ navigation }) => {
                             <Text style={styles.title}>{item.title}</Text>
                             <Text style={styles.message}>{item.message}</Text>
                             <View style={styles.actionBox}>
-                                <Button
-                                    withBackground={true}
-                                    onPress={() => nextStep()}
-                                >
-                                    <Text style={styles.textButton}>Permitir</Text>
-                                </Button>
+                                <PermisionButton
+                                    nextStep={nextStep}
+                                    permissionId={item.permissionId}
+                                />
                                 <Button
                                     onPress={() => toMain()}
                                 ><Text style={styles.cancelTextButton}>Cancelar</Text>

@@ -1,8 +1,9 @@
 import React from "react";
 import { View, StyleSheet, Text, Image } from "react-native";
 
-const imageTest = require("../../../Assets/Images/Artwork.png")
 const commentIcon = require("../../../Assets/Images/Icons/Comment.png")
+const arrowUpIcon = require("../../../Assets/Images/arrow-up.png")
+const arrowDownIcon = require("../../../Assets/Images/arrow-down.png")
 
 const Box = ({ meme }) => {
     const { title, score, num_comments, url } = meme.data
@@ -13,7 +14,9 @@ const Box = ({ meme }) => {
             </View>
             <View style={styles.footer}>
                 <View style={styles.counterBox}>
+                    <Image source={arrowUpIcon} />
                     <Text style={styles.counterText}>{score}</Text>
+                    <Image source={arrowDownIcon} />
                 </View>
                 <View style={styles.contentBox}>
                     <Text style={styles.title}>{title}</Text>
@@ -32,9 +35,10 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         elevation: 2,
         shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.3,
         backgroundColor: "#fff",
-        marginBottom: 10,
+        marginBottom: 15,
+        marginRight: 2,
     },
     image: {
         width: "100%",
@@ -52,11 +56,13 @@ const styles = StyleSheet.create({
     },
     counterBox: {
         marginRight: 10,
+        alignItems: "center"
     },
     counterText: {
         fontSize: 16,
         fontWeight: "600",
-        color: "#D8D8D8"
+        color: "#9B9B9B",
+        marginVertical: 10,
     },
     contentBox: {
         flex: 1,
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
         marginRight: 5,
     },
     commentText: {
-        color: "#D9D9D9"
+        color: "#9B9B9B"
     }
 })
 
