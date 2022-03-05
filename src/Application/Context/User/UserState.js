@@ -2,7 +2,7 @@ import React, { useReducer } from 'react';
 import UserReducer from './UserReducer';
 import { UserContext } from './UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getMemes, searchMemes } from '../../../Infraestructure/Services/RedditWS';
+import { getMemes, searchMemes } from '../../../Infrastructure/Services/RedditWS';
 
 const UserState = (props) => {
     const initialState = {
